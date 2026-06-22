@@ -1,0 +1,9 @@
+services:
+  ihandify-java-app:
+    build: .
+    container_name: ihandify-java-sample
+    ports:
+      - "8060:3000"
+    restart: unless-stopped
+    env_file:
+      - .env

@@ -1,0 +1,19 @@
+# Avoid copying local compiled binaries and build cache
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Avoid copying local IDE settings/secrets
+.vs/
+.vscode/
+.idea/
+
+# Avoid copying environment secrets
+.env
+
+# Avoid copying git history
+.git
+.gitignore

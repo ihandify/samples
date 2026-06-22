@@ -1,0 +1,9 @@
+services:
+  ihandify-python-app:
+    build: .
+    container_name: ihandify-python-sample
+    ports:
+      - "8010:3000"
+    restart: unless-stopped
+    env_file:
+      - .env

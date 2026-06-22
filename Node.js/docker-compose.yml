@@ -1,0 +1,9 @@
+services:
+  ihandify-node-app:
+    build: .
+    container_name: ihandify-node-sample
+    ports:
+      - "8040:3000"
+    restart: unless-stopped
+    env_file:
+      - .env

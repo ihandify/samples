@@ -1,0 +1,11 @@
+services:
+  ihandify-go-app:
+    build: .
+    container_name: ihandify-go-sample
+    ports:
+      - "8030:3000"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - GIN_MODE=release # Sets Gin framework to production mode

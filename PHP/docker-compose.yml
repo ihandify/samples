@@ -1,0 +1,9 @@
+services:
+  ihandify-php-app:
+    build: .
+    container_name: ihandify-php-sample
+    ports:
+      - "8020:80"
+    restart: unless-stopped
+    env_file:
+      - .env

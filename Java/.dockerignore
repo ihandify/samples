@@ -1,0 +1,21 @@
+# Avoid copying build targets and compiled artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Avoid copying local environmental runtime components
+.env
+
+# Avoid copying native IDE systems integration matrices
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Avoid copying versioning tools
+.git
+.gitignore

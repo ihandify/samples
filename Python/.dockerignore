@@ -1,0 +1,18 @@
+# Avoid copying python bytecode caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Avoid copying local IDE settings/secrets
+.vs/
+.vscode/
+.idea/
+
+# Avoid copying environment secrets
+.env
+
+# Avoid copying git history
+.git
+.gitignore
+

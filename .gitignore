@@ -1,0 +1,30 @@
+# Avoid committing local compiled binaries and build cache
+bin/
+obj/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+target/
+*.class
+*.jar
+*.war
+*.ear
+node_modules
+npm-debug.log
+
+# Avoid committing local IDE settings/secrets
+.vs/
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.user
+*.suo

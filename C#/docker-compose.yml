@@ -1,0 +1,10 @@
+services:
+  ihandify-dotnet-app:
+    build: .
+    container_name: ihandify-dotnet-sample
+    platform: linux/amd64
+    ports:
+      - "8050:3000"
+    restart: unless-stopped
+    env_file:
+      - .env

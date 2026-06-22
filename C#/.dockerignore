@@ -1,0 +1,16 @@
+# Avoid copying build and execution outputs
+bin/
+obj/
+
+# Avoid copying local IDE settings/secrets
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Avoid copying environment secrets
+.env
+
+# Avoid copying git history
+.git
+.gitignore

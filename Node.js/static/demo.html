@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            }
+        };
+    </script>
+
+    <style>
+    #latex_rendered {
+        color: red;
+    }
+
+    #latex_rendered .MathJax {
+        color: red !important;
+    }
+
+    #latex_rendered mjx-container[jax="CHTML"][display="true"] {
+        display: block;
+        text-align: left !important;
+        margin: 50px !important;
+    }
+    </style>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <title>iHandify Demo</title>
+    <link rel="icon" type="image/png" href="/static/favicon.ico">
+</head>
+
+<body>
+    <header id="page_header">
+        <a href="/demo/" class="icon_btn" id="back_btn"></a>
+        <h1 class="header_company_name">
+            iHandify Handwriting Ink Recognition Demo
+        </h1>
+        <a href="" class="icon_btn" id="info_btn"></a>
+    </header>
+    <div id="input_div">
+        <div style="margin-bottom: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+            <label for="engineSelect" style="margin-right: 10px; font-weight: bold;">Select Engine:</label>
+            <select id="engineSelect" onchange="engineChanged()" style="padding: 5px 10px; font-size: 14px;">
+                <option value="jp" selected>Japanese</option>
+                <option value="en">English</option>
+                <option value="vi">Vietnamese</option>
+                <option value="math">Math</option>                
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+            </select>
+        </div>
+        <canvas id="ja_canvas" style="border:solid 1px red"></canvas>
+    </div><br>
+    <div>
+        <button id="recognize_btn">Recognize</button>
+        <button id="clear_btn">Clear</button>
+        <h2 id="latex_rendered"></h2>
+        <h2 id="result"></h2>
+    </div>
+    <script>
+        const API_URL = "https://api.ihandify.com/v1";
+        const KEY_API_URL = "/api/generate-scoped-public-key";
+        const SCOPED_KEY_EXPIRES_IN = 60;
+        const REQUEST_TIMEOUT_MS = 20000;
+
+        var pattern = [];
+        var canvas = null;
+        var scopedPublicKey = null;
+        var keyRefreshPromise = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchScopedPublicKey();
+
+            canvas = new fabric.Canvas('ja_canvas', {
+                    isDrawingMode: true,
+                    width:1000,
+                    height:500
+                });
+            
+            fabric.Object.prototype.transparentCorners = false;
+            canvas.freeDrawingBrush = new fabric['PencilBrush'](canvas);
+            canvas.freeDrawingBrush.color = "black";
+            canvas.freeDrawingBrush.width = 3;
+            canvas.on('mouse:up', function({e}) {
+                var curStroke = [];
+                for (let i = 0; i < canvas.freeDrawingBrush._points.length; i++) {
+                    curStroke.push([Math.floor(canvas.freeDrawingBrush._points[i]["x"]), Math.floor(canvas.freeDrawingBrush._points[i]["y"])]);
+                }
+                pattern.push(curStroke);
+            });
+            let clear_btn = document.getElementById("clear_btn");
+            clear_btn.addEventListener("click", clear, false);
+            let recognize_btn = document.getElementById("recognize_btn");
+            recognize_btn.addEventListener("click", recognize, false);
+        });
+
+        async function fetchScopedPublicKey() {
+            if (keyRefreshPromise) {
+                return keyRefreshPromise;
+            }
+
+            keyRefreshPromise = (async function () {
+                try {
+                    const response = await fetch(KEY_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            expiresInSeconds: SCOPED_KEY_EXPIRES_IN
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log("Fetch Key Success:", result);
+
+                    scopedPublicKey = result.data.scopedPublicKey;
+                    return scopedPublicKey;
+                } catch (error) {
+                    console.error("Failed to Fetch Scoped Public Key:", error);
+                    throw error;
+                } finally {
+                    keyRefreshPromise = null;
+                }
+            })();
+
+            return keyRefreshPromise;
+        }
+
+        async function recognizeInk(url, onSuccess) {
+            async function doRecognize(retried) {
+                const fd = new FormData();
+                fd.append("input", JSON.stringify(pattern));
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: fd,
+                    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+                    headers: {
+                        'x-scoped-key': scopedPublicKey || ''
+                    }
+                });
+
+                if (response.status === 401 && !retried) {
+                    await fetchScopedPublicKey();
+                    return doRecognize(true);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                onSuccess(data);
+            }
+
+            try {
+                await doRecognize(false);
+            } catch (err) {
+                console.log("Error when request!!!", err);
+            }
+        }
+
+        function engineChanged() {
+            clear();
+        }
+
+        function showLatex(latex) {
+            // Show raw LaTeX
+            document.getElementById("result").innerText = "Result latex: " + latex;
+
+            // Show rendered formula
+            const formula = document.getElementById("latex_rendered");
+            formula.innerHTML = "$$" + latex + "$$";
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([formula]);
+            }
+        }
+        // For handwriting recognition: JP, EN, VI
+        async function recognizeHandwriting() {
+            const selectedEngine = document.getElementById('engineSelect').value;
+            await recognizeInk(
+                `${API_URL}/ihtr/recognize/ink/${selectedEngine}`,
+                function (data) {
+                    document.getElementById("result").innerText = "Result text: " + data["data"]["result"]["text"];
+                }
+            );
+        }
+
+        // For formula/expression recognition: Math, Chemistry, Physics
+        async function recognizeExpression() {
+            const selectedEngine = document.getElementById('engineSelect').value;
+            await recognizeInk(
+                `${API_URL}/ihfr/recognize/ink/${selectedEngine}`,
+                function (data) {
+                    showLatex(data["data"]["result"]["latex"]);
+                }
+            );
+        }
+
+        // Main handler - routes to appropriate recognition function
+        async function recognize() {
+            const selectedEngine = document.getElementById('engineSelect').value;
+
+            // Formula recognition: Math, Chemistry, Physics
+            if (['math', 'chemistry', 'physics'].includes(selectedEngine)) {
+                await recognizeExpression();
+            }
+            // Handwriting recognition: Japanese, English, Vietnamese
+            else {
+                await recognizeHandwriting();
+            }
+        }
+
+        function clear() {
+            canvas.clear();
+            pattern = [];
+            document.getElementById("result").innerText = ""
+            document.getElementById("latex_rendered").innerText = ""
+        }
+    </script>
+</body>
+
+</html>
