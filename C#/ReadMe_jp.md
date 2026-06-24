@@ -14,8 +14,8 @@
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/ihandify/csharp-sample.git
-cd csharp-sample
+git clone https://github.com/ihandify/samples.git
+cd samples/C#
 ```
 
 ### 2. シークレットAPIキーの取得
@@ -29,7 +29,7 @@ cd csharp-sample
 `.env` ファイルを開き、プレースホルダーの値を実際のシークレットAPIキーに置き換えます。
 
 ```env
-API_KEY=your_secret_api_key_here
+API_KEY=Paste_your_Secret_API_Key_here
 ```
 
 ### 4. アプリケーションの起動

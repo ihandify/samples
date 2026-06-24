@@ -14,8 +14,8 @@ This sample application demonstrates how to integrate iHandify APIs into your ap
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/ihandify/php-sample.git
-cd php-sample
+git clone https://github.com/ihandify/samples.git
+cd samples/PHP
 ```
 
 ### 2. Obtain Your Secret API Key
@@ -29,7 +29,7 @@ cd php-sample
 Open `.env` and replace the placeholder value with your Secret API Key:
 
 ```env
-API_KEY=your_secret_api_key_here
+API_KEY=Paste_your_Secret_API_Key_here
 ```
 
 ### 4. Start the Application

@@ -14,8 +14,8 @@
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/ihandify/go-sample.git
-cd go-sample
+git clone https://github.com/ihandify/samples.git
+cd samples/Go
 ```
 
 ### 2. シークレットAPIキーの取得
@@ -29,7 +29,7 @@ cd go-sample
 `.env` ファイルを開き、プレースホルダーの値を実際のシークレットAPIキーに置き換えます。
 
 ```env
-API_KEY=your_secret_api_key_here
+API_KEY=Paste_your_Secret_API_Key_here
 ```
 
 ### 4. アプリケーションの起動
