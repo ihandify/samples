@@ -29,7 +29,7 @@ cd samples/Java
 `.env` ファイルを開き、プレースホルダーの値を実際のシークレットAPIキーに置き換えます。
 
 ```env
-API_KEY=Paste_your_Secret_API_Key_here
+API_KEY="Paste_your_Secret_API_Key_here"
 ```
 
 ### 4. アプリケーションの起動

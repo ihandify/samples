@@ -29,7 +29,7 @@ cd samples/Go
 Open `.env` and replace the placeholder value with your Secret API Key:
 
 ```env
-API_KEY=Paste_your_Secret_API_Key_here
+API_KEY="Paste_your_Secret_API_Key_here"
 ```
 
 ### 4. Start the Application

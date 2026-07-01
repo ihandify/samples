@@ -60,6 +60,7 @@
     <div>
         <button id="recognize_btn">Recognize</button>
         <button id="clear_btn">Clear</button>
+        <h2 id="error_message" style="color: red;"></h2>
         <h2 id="latex_rendered"></h2>
         <h2 id="result"></h2>
     </div>
@@ -118,6 +119,7 @@
                     });
 
                     if (!response.ok) {
+                        document.getElementById("error_message").innerText = `Fetch Key - HTTP error! status: ${response.status}`;
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
@@ -127,7 +129,7 @@
                     scopedPublicKey = result.data.scopedPublicKey;
                     return scopedPublicKey;
                 } catch (error) {
-                    console.error("Failed to Fetch Scoped Public Key:", error);
+                    document.getElementById("error_message").innerText = `Fetch Key - Failed to fetch scoped public key. Please check your secret API key.\nError: ${error.message}`;
                     throw error;
                 } finally {
                     keyRefreshPromise = null;
@@ -157,6 +159,7 @@
                 }
 
                 if (!response.ok) {
+                    document.getElementById("error_message").innerText = `Recognize - HTTP error! status: ${response.status}`;
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
@@ -167,7 +170,8 @@
             try {
                 await doRecognize(false);
             } catch (err) {
-                console.log("Error when request!!!", err);
+                document.getElementById("error_message").innerText = `Recognize - Error when request!!!\nError: ${err.message}`;
+                throw err;
             }
         }
 
@@ -194,6 +198,7 @@
                 `${API_URL}/ihtr/recognize/ink/${selectedEngine}`,
                 function (data) {
                     document.getElementById("result").innerText = "Result text: " + data["data"]["result"]["text"];
+                    document.getElementById("error_message").innerText = ""
                 }
             );
         }
@@ -205,6 +210,7 @@
                 `${API_URL}/ihfr/recognize/ink/${selectedEngine}`,
                 function (data) {
                     showLatex(data["data"]["result"]["latex"]);
+                    document.getElementById("error_message").innerText = ""
                 }
             );
         }
@@ -228,6 +234,7 @@
             pattern = [];
             document.getElementById("result").innerText = ""
             document.getElementById("latex_rendered").innerText = ""
+            document.getElementById("error_message").innerText = ""
         }
     </script>
 </body>
